@@ -1,0 +1,35 @@
+{
+    "name": "PlatformJump",
+    "description": "",
+    "dependencies": {
+        "device": "*",
+        "sevenseg": "*",
+        "arcade-text": "github:microsoft/arcade-text#v1.3.0"
+    },
+    "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md",
+        "assets.json",
+        "main.py",
+        "tilemap.g.jres",
+        "tilemap.g.ts",
+        "images.g.jres",
+        "images.g.ts"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "targetVersions": {
+        "branch": "v1.12.32",
+        "tag": "v1.12.32",
+        "commits": "https://github.com/microsoft/pxt-arcade/commits/2bc63c8f9e7915ee02ddc6f113204107954f24b6",
+        "target": "1.12.32",
+        "pxt": "8.5.44",
+        "targetId": "arcade"
+    },
+    "supportedTargets": [
+        "arcade"
+    ],
+    "preferredEditor": "pyprj"
+}
