@@ -15,13 +15,15 @@ def player_reset():
     x_vel = 0
     y_vel = 0
 def next_level():
-    global level, pos, level_blocks, block_type, levels, level_counter
+    global level, pos, level_blocks, block_type, levels, level_counter, playing
     player_reset()
     sprites.destroy_all_sprites_of_kind(block_type)
     level += 1
     level_counter.count = level + 1
     if level >= levels.length:
         game.set_game_over_message(True, "YOU WIN")
+        music.stop_all_sounds()
+        playing = False
         game.game_over(True)
     level_data = levels[level]
     pos = [0, 0]
@@ -59,6 +61,15 @@ def check_lr_max():
         x_vel = max_speed
     if x_vel < max_speed * -1:
         x_vel = max_speed * -1
+def play_song():
+    basscleff = music.create_song(assets.song("""basscleff"""))
+    basscleff_volume = 20
+
+    while playing:
+        music.set_volume(basscleff_volume)
+        music.play(basscleff, music.PlaybackMode.UNTIL_DONE)
+
+playing = True
 level_counter = sevenseg.create_counter(SegmentStyle.Thick, SegmentScale.Full, 2)
 level_blocks:List[Sprite] = []
 map_coord_y = 0
@@ -143,8 +154,8 @@ def check(x, y, stack = 0):
     for block in level_blocks:
         if play.overlaps_with(block) and block.kind() == block_type \
          or play.x < 8:
-            play.x -= x / 4
-            play.y -= y / 4
+            play.x -= 0.5 * Math.sign(x)
+            play.y -= 0.5 * Math.sign(y)
             if not stack == 63:
                 check(x, y, stack + 1)
             else:
@@ -153,3 +164,5 @@ def check(x, y, stack = 0):
     return False
 
 game.on_update(on_on_update)
+
+play_song()

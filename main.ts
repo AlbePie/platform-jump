@@ -33,6 +33,8 @@ function next_level() {
     level_counter.count = level + 1
     if (level >= levels.length) {
         game.setGameOverMessage(true, "YOU WIN")
+        music.stopAllSounds()
+        playing = false
         game.gameOver(true)
     }
     
@@ -85,6 +87,16 @@ function check_lr_max() {
     
 }
 
+function play_song() {
+    let basscleff = music.createSong(assets.song`basscleff`)
+    let basscleff_volume = 20
+    while (playing) {
+        music.setVolume(basscleff_volume)
+        music.play(basscleff, music.PlaybackMode.UntilDone)
+    }
+}
+
+let playing = true
 let level_counter = sevenseg.createCounter(SegmentStyle.Thick, SegmentScale.Full, 2)
 let level_blocks : Sprite[] = []
 let map_coord_y = 0
@@ -157,8 +169,8 @@ function check(x: number, y: number, stack: number = 0): boolean {
     
     for (let block of level_blocks) {
         if (play.overlapsWith(block) && block.kind() == block_type || play.x < 8) {
-            play.x -= x / 4
-            play.y -= y / 4
+            play.x -= 0.5 * Math.sign(x)
+            play.y -= 0.5 * Math.sign(y)
             if (!(stack == 63)) {
                 check(x, y, stack + 1)
             } else {
@@ -193,3 +205,4 @@ game.onUpdate(function on_on_update() {
     }
     
 })
+play_song()
