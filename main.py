@@ -27,6 +27,7 @@ def next_level(reached_by_player):
     player_reset()
     sprites.destroy_all_sprites_of_kind(block_type)
     sprites.destroy_all_sprites_of_kind(lava_type)
+    sprites.destroy_all_sprites_of_kind(trampoline_type)
     level += 1 if reached_by_player else 0
     level_counter.count = level + 1
     if level >= levels.length:
@@ -182,7 +183,51 @@ aaaaaaaaaaaaaabb
 aaaaaaaaaatraabb
 aaaaaaaaaampaabb
 bbbbbbbbbbbbbbbb
-bbbbbbbbbbbbbbbb""", "The trampoline boosts you up")]
+bbbbbbbbbbbbbbbb""", "The trampoline boosts you up"), Level("""aaaaaaaaaaaaaaaa
+aaaaaaaaabaaaaaa
+aaaaaaaabblllb
+aaaaaaabbblllbbb
+aaaaaabbbbbbbbbb
+aaaaaaaaaabaaabb
+aaaaaaaaaaabaabb
+aaaaatraaaaababb
+aaaaampaaaaaabbb
+bbbbbbbaaaaaaabb
+blllllllllllllbb
+bbbbbbbbbbbbbbbb""", "That's all from me, from now on you will continue playing alone"), Level("""aaaaaaaaaaaaaabb
+aaaaaaaaaaaaaaab
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaabbbbbbbbbbb
+aaaaaaaaaabaaabb
+aaaaaaaaaaabaabb
+aaaaaaaaaaaababb
+aaaaatraaaaaabbb
+aaaaampaaaaaaabb
+bbbbbbbbbbbbbbbb
+bbbbbbbbbbbbbbbb""", ""), Level("""aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+llllllllllllllll
+llllllllllllllll
+aaaaaaaaaabbaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaatraaaaaa
+aaaaaaaampaaaaaa
+babbaaabbbbbaaab
+bllllllllllllllb
+bbbbbbbbbbbbbbbb""", ""), Level("""aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaalbbbbbbbblllb
+traaaaaaaaaaaaab
+mpaaaaaaaaaaaaab
+bbbbbbbbbbaaaaab
+aaaaaaaaaaaaaaab
+aaaaaaaaaaaaaaab
+aaaaaaaaaaaaaaab
+baaaaaaaabaatrab
+blbblllbbbaampab
+bbbbbbbbbbbbbbbb""", "")]
 level = 0
 next_level(False)
 ground:bool = False
@@ -244,12 +289,16 @@ def move_y(value):
 
 def check(x, y, stack = 0):
     global level_blocks, play, block_type, trampoline, trampoline_type
-    go_back = False
+    go_back = play.x < 8
     was_in_trampoline = False
     for block in level_blocks:
-        if play.overlaps_with(block) and block.kind() == trampoline_type:
+        if Math.abs(block.x - play.x) > 16 or \
+            Math.abs(block.y - play.y) > 16 or \
+            not play.overlaps_with(block):
+            continue
+        if block.kind() == trampoline_type:
             was_in_trampoline = True
-        elif play.overlaps_with(block) and block.kind() == lava_type:
+        elif block.kind() == lava_type:
             music.set_volume(80)
             lose_sound = music.create_song(assets.song("""level_lose"""))
             music.play(lose_sound, \
@@ -263,8 +312,7 @@ def check(x, y, stack = 0):
             for i in range(5):
                 death_effect.start_effect(effects.fountain, 500)
             sprites.destroy(death_effect)
-        elif play.overlaps_with(block) and block.kind() == block_type \
-         or play.x < 8:
+        elif block.kind() == block_type:
             go_back = True
     
     if was_in_trampoline:
@@ -272,7 +320,6 @@ def check(x, y, stack = 0):
         boost_up()
     else:
         trampoline = 0
-        print(trampoline)
     if go_back:
         play.x -= 0.5 * Math.sign(x)
         play.y -= 0.5 * Math.sign(y)

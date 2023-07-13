@@ -48,6 +48,7 @@ function next_level(reached_by_player: boolean) {
     player_reset()
     sprites.destroyAllSpritesOfKind(block_type)
     sprites.destroyAllSpritesOfKind(lava_type)
+    sprites.destroyAllSpritesOfKind(trampoline_type)
     level += reached_by_player ? 1 : 0
     level_counter.count = level + 1
     if (level >= levels.length) {
@@ -223,7 +224,51 @@ aaaaaaaaaaaaaabb
 aaaaaaaaaatraabb
 aaaaaaaaaampaabb
 bbbbbbbbbbbbbbbb
-bbbbbbbbbbbbbbbb`, "The trampoline boosts you up")]
+bbbbbbbbbbbbbbbb`, "The trampoline boosts you up"), Level(`aaaaaaaaaaaaaaaa
+aaaaaaaaabaaaaaa
+aaaaaaaabblllb
+aaaaaaabbblllbbb
+aaaaaabbbbbbbbbb
+aaaaaaaaaabaaabb
+aaaaaaaaaaabaabb
+aaaaatraaaaababb
+aaaaampaaaaaabbb
+bbbbbbbaaaaaaabb
+blllllllllllllbb
+bbbbbbbbbbbbbbbb`, "That's all from me, from now on you will continue playing alone"), Level(`aaaaaaaaaaaaaabb
+aaaaaaaaaaaaaaab
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaabbbbbbbbbbb
+aaaaaaaaaabaaabb
+aaaaaaaaaaabaabb
+aaaaaaaaaaaababb
+aaaaatraaaaaabbb
+aaaaampaaaaaaabb
+bbbbbbbbbbbbbbbb
+bbbbbbbbbbbbbbbb`, ""), Level(`aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+llllllllllllllll
+llllllllllllllll
+aaaaaaaaaabbaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaatraaaaaa
+aaaaaaaampaaaaaa
+babbaaabbbbbaaab
+bllllllllllllllb
+bbbbbbbbbbbbbbbb`, ""), Level(`aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaalbbbbbbbblllb
+traaaaaaaaaaaaab
+mpaaaaaaaaaaaaab
+bbbbbbbbbbaaaaab
+aaaaaaaaaaaaaaab
+aaaaaaaaaaaaaaab
+aaaaaaaaaaaaaaab
+baaaaaaaabaatrab
+blbblllbbbaampab
+bbbbbbbbbbbbbbbb`, "")]
 level = 0
 next_level(false)
 let ground = false
@@ -274,12 +319,16 @@ function check(x: number, y: number, stack: number = 0): boolean {
     let lose_sound: music.Playable;
     let death_effect: Sprite;
     
-    let go_back = false
+    let go_back = play.x < 8
     let was_in_trampoline = false
     for (let block of level_blocks) {
-        if (play.overlapsWith(block) && block.kind() == trampoline_type) {
+        if (Math.abs(block.x - play.x) > 16 || Math.abs(block.y - play.y) > 16 || !play.overlapsWith(block)) {
+            continue
+        }
+        
+        if (block.kind() == trampoline_type) {
             was_in_trampoline = true
-        } else if (play.overlapsWith(block) && block.kind() == lava_type) {
+        } else if (block.kind() == lava_type) {
             music.setVolume(80)
             lose_sound = music.createSong(assets.song`level_lose`)
             music.play(lose_sound, music.PlaybackMode.InBackground)
@@ -293,7 +342,7 @@ function check(x: number, y: number, stack: number = 0): boolean {
                 death_effect.startEffect(effects.fountain, 500)
             }
             sprites.destroy(death_effect)
-        } else if (play.overlapsWith(block) && block.kind() == block_type || play.x < 8) {
+        } else if (block.kind() == block_type) {
             go_back = true
         }
         
@@ -303,7 +352,6 @@ function check(x: number, y: number, stack: number = 0): boolean {
         boost_up()
     } else {
         trampoline = 0
-        console.log(trampoline)
     }
     
     if (go_back) {
