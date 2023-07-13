@@ -18,8 +18,25 @@ function player_reset() {
     
     play.x = 30
     play.y = 80
-    x_vel = 0
-    y_vel = 0
+    let ___tempvar10 = [0, 0]
+    x_vel = ___tempvar10[0]
+    y_vel = ___tempvar10[1]
+    let ___tempvar11 = [false, false]
+    ground = ___tempvar11[0]
+    ceiling = ___tempvar11[1]
+}
+
+function show_level_text() {
+    
+    let level_text = level_texts[level]
+    if (level_text) {
+        game.showLongText(level_text, DialogLayout.Top)
+        if (level == 0) {
+            game.showLongText("You advance by being in the left edge", DialogLayout.Top)
+        }
+        
+    }
+    
 }
 
 function next_level(reached_by_player: boolean) {
@@ -31,7 +48,7 @@ function next_level(reached_by_player: boolean) {
     player_reset()
     sprites.destroyAllSpritesOfKind(block_type)
     sprites.destroyAllSpritesOfKind(lava_type)
-    level += 1
+    level += reached_by_player ? 1 : 0
     level_counter.count = level + 1
     if (level >= levels.length) {
         game.setGameOverMessage(true, "YOU WIN")
@@ -56,31 +73,17 @@ function next_level(reached_by_player: boolean) {
                 
             } else {
                 if (block == "b") {
-                    sprite = sprites.create(img`
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    `, block_type)
+                    sprite = sprites.create(assets.image`l_block`, block_type)
                 } else if (block == "l") {
-                    sprite = sprites.create(img`
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                    `, lava_type)
+                    sprite = sprites.create(assets.image`l_lava`, lava_type)
+                } else if (block == "t") {
+                    sprite = sprites.create(assets.image`l_trampoline_upper_left`, trampoline_type)
+                } else if (block == "r") {
+                    sprite = sprites.create(assets.image`l_trampoline_upper_right`, trampoline_type)
+                } else if (block == "m") {
+                    sprite = sprites.create(assets.image`l_trampoline_bottom_left`, trampoline_type)
+                } else if (block == "p") {
+                    sprite = sprites.create(assets.image`l_trampoline_bottom_right`, trampoline_type)
                 }
                 
                 sprite.x = coord_x
@@ -92,9 +95,15 @@ function next_level(reached_by_player: boolean) {
         }
         pos[1] += 1
     }
+    if (reached_by_player) {
+        show_level_text()
+    }
+    
 }
 
-function Level(data: string): string[] {
+function Level(data: string, text: string): string[] {
+    
+    level_texts.push(text)
     return data.split("\n")
 }
 
@@ -110,17 +119,22 @@ function check_lr_max() {
     
 }
 
-function play_song() {
+function play_song(show_text: boolean = false) {
     
     let basscleff = music.createSong(assets.song`basscleff`)
     let basscleff_volume = 100
-    while (true) {
-        if (playing) {
-            music.setVolume(basscleff_volume)
-            music.play(basscleff, music.PlaybackMode.UntilDone)
+    if (playing) {
+        music.setVolume(basscleff_volume)
+        music.play(basscleff, music.PlaybackMode.LoopingInBackground)
+        if (show_text) {
+            show_level_text()
+            show_text = false
         }
         
+    } else {
+        return
     }
+    
 }
 
 let playing = true
@@ -140,7 +154,9 @@ scene.setBackgroundImage(sprites.background.cityscape)
 let play = sprites.create(assets.image`player`, SpriteKind.Player)
 let block_type = SpriteKind.create()
 let lava_type = SpriteKind.create()
+let trampoline_type = SpriteKind.create()
 max_speed = 8
+let level_texts : string[] = []
 let levels = [Level(`aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
@@ -152,7 +168,7 @@ aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 bbbbbbbbbbbbbbbb
-bbbbbbbbbbbbbbbb`), Level(`aaaaaaaaaaaaaaaa
+bbbbbbbbbbbbbbbb`, "You can move with left and right"), Level(`aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
@@ -163,7 +179,7 @@ aaaaaaaaaaaabbaa
 aaaaaaaaaaaabbaa
 aaaaaaaaaaaabbaa
 bbbbbbbbbbbbbbbb
-bbbbbbbbbbbbbbbb`), Level(`aaaaaaaaaaaaaaaa
+bbbbbbbbbbbbbbbb`, "You jump by pressing up or A"), Level(`aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaabbbb
@@ -174,7 +190,7 @@ aaaaaaaaaabbaabb
 aaaaaaaaaabbaabb
 aaaaaaaaaaaaaabb
 bbbbbbbbbbbbbbbb
-bbbbbbbbbbbbbbbb`), Level(`aaaaaaaaaaaaaaaa
+bbbbbbbbbbbbbbbb`, "Parkour!"), Level(`aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
@@ -185,7 +201,7 @@ aaaaaaaaaaaaaaaa
 aaaaaaabaaaaaaba
 aaaaaabbllllllbb
 bbbbbbbbllllllbb
-bbbbbbbbbbbbbbbb`), Level(`aaaaaaaaaaaaaabb
+bbbbbbbbbbbbbbbb`, "If you die, you have to play the level again"), Level(`aaaaaaaaaaaaaabb
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaabbb
@@ -196,16 +212,44 @@ aaaaaaaaaaaaabbb
 aaaaaaabbaaabbbb
 babbaaaaaaaaaabb
 blllllllllllllbb
-bbbbbbbbbbbbbbbb`)]
-level = -1
+bbbbbbbbbbbbbbbb`, "Jump from the upper block"), Level(`aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaabb
+aaaaaaaaaaaaaabb
+aaaaaaaaaaaaaabb
+aaaaaaaaaaaaaabb
+aaaaaaaaaatraabb
+aaaaaaaaaampaabb
+bbbbbbbbbbbbbbbb
+bbbbbbbbbbbbbbbb`, "The trampoline boosts you up")]
+level = 0
 next_level(false)
 let ground = false
 let ceiling = false
+let trampoline = 0
 function move_x(value: number) {
     
     divider = 4
     play.x += value / divider
     check(value, 0)
+}
+
+function boost_up() {
+    let trampoline_sound: music.Playable;
+    
+    if (trampoline >= 1) {
+        y_vel = -10
+        play.startEffect(effects.spray, 200)
+        if (trampoline == 1) {
+            music.setVolume(40)
+            trampoline_sound = music.createSong(assets.song`trampoline_sound`)
+            music.play(trampoline_sound, music.PlaybackMode.InBackground)
+        }
+        
+    }
+    
 }
 
 function move_y(value: number) {
@@ -231,8 +275,11 @@ function check(x: number, y: number, stack: number = 0): boolean {
     let death_effect: Sprite;
     
     let go_back = false
+    let was_in_trampoline = false
     for (let block of level_blocks) {
-        if (play.overlapsWith(block) && block.kind() == lava_type) {
+        if (play.overlapsWith(block) && block.kind() == trampoline_type) {
+            was_in_trampoline = true
+        } else if (play.overlapsWith(block) && block.kind() == lava_type) {
             music.setVolume(80)
             lose_sound = music.createSong(assets.song`level_lose`)
             music.play(lose_sound, music.PlaybackMode.InBackground)
@@ -242,13 +289,23 @@ function check(x: number, y: number, stack: number = 0): boolean {
             death_effect.x = play.x
             death_effect.y = play.y
             player_reset()
-            death_effect.startEffect(effects.fountain, 500)
+            for (let i = 0; i < 5; i++) {
+                death_effect.startEffect(effects.fountain, 500)
+            }
             sprites.destroy(death_effect)
         } else if (play.overlapsWith(block) && block.kind() == block_type || play.x < 8) {
             go_back = true
         }
         
     }
+    if (was_in_trampoline) {
+        trampoline += 1
+        boost_up()
+    } else {
+        trampoline = 0
+        console.log(trampoline)
+    }
+    
     if (go_back) {
         play.x -= 0.5 * Math.sign(x)
         play.y -= 0.5 * Math.sign(y)
@@ -267,6 +324,10 @@ function check(x: number, y: number, stack: number = 0): boolean {
 game.onUpdate(function on_on_update() {
     let jump_sound: music.Playable;
     
+    if (!playing) {
+        return
+    }
+    
     move_lr()
     check_lr_max()
     apply_friction()
@@ -275,7 +336,9 @@ game.onUpdate(function on_on_update() {
     if (controller.up.isPressed() || controller.A.isPressed()) {
         if (ground) {
             y_vel = -6
-            play.startEffect(effects.spray, 200)
+            for (let i = 0; i < 3; i++) {
+                play.startEffect(effects.spray, 200)
+            }
             music.setVolume(80)
             jump_sound = music.createSong(assets.song`jump`)
             music.play(jump_sound, music.PlaybackMode.InBackground)
@@ -289,4 +352,4 @@ game.onUpdate(function on_on_update() {
     }
     
 })
-play_song()
+play_song(true)

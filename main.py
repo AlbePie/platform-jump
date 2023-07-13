@@ -9,18 +9,25 @@ def move_lr():
     elif controller.right.is_pressed():
         x_vel += 1
 def player_reset():
-    global play, x_vel, y_vel
+    global play, x_vel, y_vel, ground, ceiling
     play.x = 30
     play.y = 80
-    x_vel = 0
-    y_vel = 0
+    x_vel, y_vel = 0, 0
+    ground, ceiling = False, False
+def show_level_text():
+    global level_texts, level
+    level_text = level_texts[level]
+    if level_text:
+        game.show_long_text(level_text, DialogLayout.TOP)
+        if level == 0:
+            game.show_long_text("You advance by being in the left edge", DialogLayout.TOP)
 def next_level(reached_by_player):
     global level, pos, level_blocks, block_type, levels, \
-    level_counter, playing, lava_type
+    level_counter, playing, lava_type, level_texts, trampoline_type
     player_reset()
     sprites.destroy_all_sprites_of_kind(block_type)
     sprites.destroy_all_sprites_of_kind(lava_type)
-    level += 1
+    level += 1 if reached_by_player else 0
     level_counter.count = level + 1
     if level >= levels.length:
         game.set_game_over_message(True, "YOU WIN")
@@ -41,39 +48,33 @@ def next_level(reached_by_player):
                 pass
             else:
                 if block == "b":
-                    sprite = sprites.create(img("""
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    f f f f f f f f f f
-                    """),
+                    sprite= sprites.create(assets.image("""l_block"""),
                     block_type)
                 elif block == "l":
-                    sprite = sprites.create(img("""
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                        2 2 2 2 2 2 2 2 2 2
-                    """),
+                    sprite = sprites.create(assets.image("""l_lava"""),
                     lava_type)
+                elif block == "t":
+                    sprite = sprites.create(assets.image("""l_trampoline_upper_left"""),
+                    trampoline_type)
+                elif block == "r":
+                    sprite = sprites.create(assets.image("""l_trampoline_upper_right"""),
+                    trampoline_type)
+                elif block == "m":
+                    sprite = sprites.create(assets.image("""l_trampoline_bottom_left"""),
+                    trampoline_type)
+                elif block == "p":
+                    sprite = sprites.create(assets.image("""l_trampoline_bottom_right"""),
+                    trampoline_type)
                 sprite.x = coord_x
                 sprite.y = coord_y
                 level_blocks.push(sprite)
             pos[0] += 1
         pos[1] += 1
-def Level(data: str):
+    if reached_by_player:
+        show_level_text()
+def Level(data: str, text:str):
+    global level_texts
+    level_texts.push(text)
     return data.split("\n")
 def check_lr_max():
     global x_vel
@@ -81,15 +82,19 @@ def check_lr_max():
         x_vel = max_speed
     if x_vel < max_speed * -1:
         x_vel = max_speed * -1
-def play_song():
+def play_song(show_text=False):
     global playing
     basscleff = music.create_song(assets.song("""basscleff"""))
     basscleff_volume = 100
 
-    while True:
-        if playing:
-            music.set_volume(basscleff_volume)
-            music.play(basscleff, music.PlaybackMode.UNTIL_DONE)
+    if playing:
+        music.set_volume(basscleff_volume)
+        music.play(basscleff, music.PlaybackMode.LOOPING_IN_BACKGROUND)
+        if show_text:
+            show_level_text()
+            show_text = False
+    else:
+        return
 
 playing = True
 level_counter = sevenseg.create_counter(SegmentStyle.Thick, SegmentScale.Full, 2)
@@ -108,7 +113,9 @@ scene.set_background_image(sprites.background.cityscape)
 play = sprites.create(assets.image("""player"""), SpriteKind.player)
 block_type = SpriteKind.create()
 lava_type = SpriteKind.create()
+trampoline_type = SpriteKind.create()
 max_speed = 8
+level_texts:List[string] = []
 levels = [Level("""aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
@@ -120,7 +127,7 @@ aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 bbbbbbbbbbbbbbbb
-bbbbbbbbbbbbbbbb"""), Level("""aaaaaaaaaaaaaaaa
+bbbbbbbbbbbbbbbb""", "You can move with left and right"), Level("""aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
@@ -131,7 +138,7 @@ aaaaaaaaaaaabbaa
 aaaaaaaaaaaabbaa
 aaaaaaaaaaaabbaa
 bbbbbbbbbbbbbbbb
-bbbbbbbbbbbbbbbb"""), Level("""aaaaaaaaaaaaaaaa
+bbbbbbbbbbbbbbbb""", "You jump by pressing up or A"), Level("""aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaabbbb
@@ -142,7 +149,7 @@ aaaaaaaaaabbaabb
 aaaaaaaaaabbaabb
 aaaaaaaaaaaaaabb
 bbbbbbbbbbbbbbbb
-bbbbbbbbbbbbbbbb"""), Level("""aaaaaaaaaaaaaaaa
+bbbbbbbbbbbbbbbb""", "Parkour!"), Level("""aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
@@ -153,7 +160,7 @@ aaaaaaaaaaaaaaaa
 aaaaaaabaaaaaaba
 aaaaaabbllllllbb
 bbbbbbbbllllllbb
-bbbbbbbbbbbbbbbb"""), Level("""aaaaaaaaaaaaaabb
+bbbbbbbbbbbbbbbb""", "If you die, you have to play the level again"), Level("""aaaaaaaaaaaaaabb
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaaaaa
 aaaaaaaaaaaaabbb
@@ -164,14 +171,28 @@ aaaaaaaaaaaaabbb
 aaaaaaabbaaabbbb
 babbaaaaaaaaaabb
 blllllllllllllbb
-bbbbbbbbbbbbbbbb""")]
-level = -1
+bbbbbbbbbbbbbbbb""", "Jump from the upper block"), Level("""aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaabb
+aaaaaaaaaaaaaabb
+aaaaaaaaaaaaaabb
+aaaaaaaaaaaaaabb
+aaaaaaaaaatraabb
+aaaaaaaaaampaabb
+bbbbbbbbbbbbbbbb
+bbbbbbbbbbbbbbbb""", "The trampoline boosts you up")]
+level = 0
 next_level(False)
 ground:bool = False
 ceiling:bool = False
+trampoline:number = 0
 
 def on_on_update():
-    global y_vel, map_coord_x, map_coord_y, ground
+    global y_vel, map_coord_x, map_coord_y, ground, playing, trampoline
+    if not playing:
+        return
     move_lr()
     check_lr_max()
     apply_friction()
@@ -180,12 +201,12 @@ def on_on_update():
     if controller.up.is_pressed() or controller.A.is_pressed():
         if ground:
             y_vel = -6
-            play.start_effect(effects.spray, 200)
+            for i in range(3):
+                play.start_effect(effects.spray, 200)
             music.set_volume(80)
             jump_sound = music.create_song(assets.song("""jump"""))
             music.play(jump_sound, \
             music.PlaybackMode.IN_BACKGROUND)
-    
     move_y(y_vel)
 
     if play.x > scene.screen_width():
@@ -196,6 +217,17 @@ def move_x(value):
     divider = 4
     play.x += value / divider
     check(value, 0)
+
+def boost_up():
+    global y_vel, trampoline, play
+    if trampoline >= 1:
+        y_vel = -10
+        play.start_effect(effects.spray, 200)
+        if trampoline == 1:
+            music.set_volume(40)
+            trampoline_sound = music.create_song(assets.song("""trampoline_sound"""))
+            music.play(trampoline_sound, \
+            music.PlaybackMode.IN_BACKGROUND)
 
 def move_y(value):
     global ground, ceiling, y_vel
@@ -211,10 +243,13 @@ def move_y(value):
         y_vel = 0
 
 def check(x, y, stack = 0):
-    global level_blocks, play, block_type
+    global level_blocks, play, block_type, trampoline, trampoline_type
     go_back = False
+    was_in_trampoline = False
     for block in level_blocks:
-        if play.overlaps_with(block) and block.kind() == lava_type:
+        if play.overlaps_with(block) and block.kind() == trampoline_type:
+            was_in_trampoline = True
+        elif play.overlaps_with(block) and block.kind() == lava_type:
             music.set_volume(80)
             lose_sound = music.create_song(assets.song("""level_lose"""))
             music.play(lose_sound, \
@@ -225,12 +260,19 @@ def check(x, y, stack = 0):
             death_effect.x = play.x
             death_effect.y = play.y
             player_reset()
-            death_effect.start_effect(effects.fountain, 500)
+            for i in range(5):
+                death_effect.start_effect(effects.fountain, 500)
             sprites.destroy(death_effect)
         elif play.overlaps_with(block) and block.kind() == block_type \
          or play.x < 8:
             go_back = True
     
+    if was_in_trampoline:
+        trampoline += 1
+        boost_up()
+    else:
+        trampoline = 0
+        print(trampoline)
     if go_back:
         play.x -= 0.5 * Math.sign(x)
         play.y -= 0.5 * Math.sign(y)
@@ -244,4 +286,4 @@ def check(x, y, stack = 0):
 
 game.on_update(on_on_update)
 
-play_song()
+play_song(True)
