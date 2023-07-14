@@ -33,6 +33,8 @@ function show_level_text() {
         game.showLongText(level_text, DialogLayout.Top)
         if (level == 0) {
             game.showLongText("You advance by being in the left edge", DialogLayout.Top)
+        } else if (level == 12) {
+            game.showLongText("Yes, that's me. I just wanna remind you that there are only " + ("" + (level_texts.length - level)) + " levels 'til the end.", DialogLayout.Top)
         }
         
     }
@@ -268,7 +270,51 @@ aaaaaaaaaaaaaaab
 aaaaaaaaaaaaaaab
 baaaaaaaabaatrab
 blbblllbbbaampab
-bbbbbbbbbbbbbbbb`, "")]
+bbbbbbbbbbbbbbbb`, ""), Level(`aaaaaaaaaallllll
+aaaaaaaaaallllll
+aaaaaaaaaallllll
+aaaaaaaaaallllll
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaabbbbbb
+aaaaaaaaaallllbb
+aaaaaaatralllllb
+aaaaaaampalllllb
+bbbbbbbbbbbbbbbb
+bbbbbbbbbbbbbbbb`, ""), Level(`aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaabbb
+aaaaaaaaabbaaabb
+aaaaaaaaallaaaab
+aaaaabaaaaaaaaab
+aaaaabbaaaaaaaab
+aaaaaaaaabbaaaab
+aaaaaaaaallaaaab
+aaaaaaaaaaaaaaab
+bbbbbbbbbbbbbbbb
+bbbbbbbbbbbbbbbb`, ""), Level(`aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+bbbbbbbbbbbbbbbb
+bbbbbbbbbbbbbbbb`, "BOO!"), Level(`blaaaaaaalbbbbbb
+blaaaaaaalbbbbbb
+blaaaaaaalbbbbbb
+blaaaaaaalbbbbbb
+blaalllaalbbbbbb
+blaalblaalbbbbbb
+blaalblaalbbbbbb
+blaalblaalllllll
+bltrlblaaaaaaaaa
+blmplblaaaaaaaaa
+bllllblbbbbbbbbb
+bbbbbblbbbbbbbbb`, "Only two levels")]
 level = 0
 next_level(false)
 let ground = false

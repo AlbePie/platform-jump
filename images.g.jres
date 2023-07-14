@@ -37,7 +37,12 @@
     "image6": {
         "data": "hwQKAAoAAAAzMwAAAAAAADMzAAAAAAAAMzMAAAAAAAAzMwAAAAAAADMzAAAAAAAAMzMAAAAAAAAzMwAAAAAAADMzAAAAAAAAMzMzMzMAAAAzMzMzMwAAAA==",
         "mimeType": "image/x-mkcd-f4",
-        "displayName": "l_trampoline_upper_left"
+        "displayName": "l_trampoline_upper_left0"
+    },
+    "image9": {
+        "data": "hwQQABAAAAAAAAAAAAAAAAAAAPAPAAAAAPD///7gRAAA/+/v7k9NAPD+Lv/v/v8A8P7yIu/+Qv/v/i7y7v5C/+8v8u7u/kIP7y/y7u7+Qg/v/i7y7v5C//D+8iLv/kL/8P4u/+7+/wAA/+/v7k9NAADw///+4EQAAAAA8A8AAAAAAAAAAAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "jumpscarer"
     },
     "song1": {
         "data": "0078000408020105001c000f0a006400f4010a00000400000000000000000000000000000000024e0000000400010d04000800011908000c00010d0c00100001191000140001111400180001121c002000010a24002800011928002c00010d2c00300001193000340001113400380001123c0040000116",
@@ -64,9 +69,15 @@
         "namespace": "mySongs."
     },
     "song5": {
-        "data": "00b4000408010101001c000f05001202c102c20100040500280000006400280003140006020004120000000400010f04000800011108000c000118",
+        "data": "00b4000408010101001c000f05001202c102c20100040500280000006400280003050006000004120000000400010f04000800011108000c000118",
         "mimeType": "application/mkcd-song",
         "displayName": "trampoline_sound",
+        "namespace": "mySongs."
+    },
+    "song6": {
+        "data": "00b4000408010104001c00100500640000041e000004000000000000000000000000000a040004060000002000011e",
+        "mimeType": "application/mkcd-song",
+        "displayName": "jumpscare",
         "namespace": "mySongs."
     },
     "*": {
