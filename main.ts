@@ -34,7 +34,7 @@ function show_level_text() {
         if (level == 0) {
             game.showLongText("You advance by being in the left edge", DialogLayout.Top)
         } else if (level == 12) {
-            game.showLongText("Yes, that's me. I just wanna remind you that there are only " + ("" + (level_texts.length - level)) + " levels 'til the end.", DialogLayout.Top)
+            game.showLongText("Yes, that's me. I just want to remind you that there are only " + ("" + 3) + " levels until the end.", DialogLayout.Top)
         }
         
     }
@@ -98,6 +98,10 @@ function next_level(reached_by_player: boolean) {
         }
         pos[1] += 1
     }
+    if (level == 0) {
+        game.splash("PlatformJump", "A game by Albemag")
+    }
+    
     if (reached_by_player) {
         show_level_text()
     }
@@ -265,9 +269,9 @@ aaalbbbbbbbblllb
 traaaaaaaaaaaaab
 mpaaaaaaaaaaaaab
 bbbbbbbbbbaaaaab
-aaaaaaaaaaaaaaab
-aaaaaaaaaaaaaaab
-aaaaaaaaaaaaaaab
+bbbaaaaaaaaaaaab
+bbaaaaaaaaaaaaab
+baaaaaaaaaaaaaab
 baaaaaaaabaatrab
 blbblllbbbaampab
 bbbbbbbbbbbbbbbb`, ""), Level(`aaaaaaaaaallllll
@@ -314,7 +318,29 @@ blaalblaalllllll
 bltrlblaaaaaaaaa
 blmplblaaaaaaaaa
 bllllblbbbbbbbbb
-bbbbbblbbbbbbbbb`, "Only two levels")]
+bbbbbblbbbbbbbbb`, "Only two levels"), Level(`traaaaaaabaaaaab
+mpaaaaaaabaaaaaa
+bbaaaaaaaaaaaaaa
+aaaaaaaaaaaaabbb
+aaaaaaabaaaaaabb
+aaaaaaaaaaaaaaab
+aaaaaaaaaaaaaaab
+aaaaaaaaaaaabaab
+aaaaaaaaaaabbaab
+baabaaaaabaaaaab
+bllllllllllllllb
+bbbbbbbbbbbbbbbb`, "Last level..."), Level(`aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaa
+bbbbbbbbbbbbbbbb
+bbbbbbbbbbbbbbbb`, "Congratulations! You finished PlatformJump! Finish this level to win.")]
 level = 0
 next_level(false)
 let ground = false
